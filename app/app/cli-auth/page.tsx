@@ -1,6 +1,6 @@
 "use client";
 
-import { useAuth, OrganizationSwitcher } from "@clerk/nextjs";
+import { useAuth } from "@/lib/use-auth";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -11,7 +11,6 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import toast from "react-hot-toast";
-import { Loader } from "lucide-react";
 
 export default function Page() {
   return (
@@ -22,43 +21,36 @@ export default function Page() {
 }
 
 function CliAuth() {
-  const { getToken, orgId, isLoaded } = useAuth();
+  const { getToken, orgId } = useAuth();
 
   const handleGetToken = async () => {
-    const newToken = await getToken({
-      template: "extended-cli-token",
-    });
+    const token = await getToken();
 
-    if (!newToken) {
+    if (!token) {
       toast.error("Failed to get token");
       return;
     }
 
     const url = new URL("http://localhost:9999");
-    url.searchParams.append("token", newToken);
+    url.searchParams.append("token", token);
     window.location.href = url.toString();
   };
-
-  if (!isLoaded) {
-    return <Loader className="w-10 h-10" />;
-  }
 
   return (
     <Card className="w-[800px]">
       <CardHeader>
         <CardTitle>CLI Authentication</CardTitle>
         <CardDescription>
-          Select an organization and confirm CLI authentication
+          Confirm CLI authentication (self-hosted mode)
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <OrganizationSwitcher
-          hidePersonal={true}
-          afterSelectOrganizationUrl="/cli-auth?force=true"
-        />
+        <p className="text-sm text-muted-foreground">
+          Organization: {orgId}
+        </p>
       </CardContent>
       <CardFooter className="flex flex-col space-y-2">
-        <Button onClick={handleGetToken} className="w-full" disabled={!orgId}>
+        <Button onClick={handleGetToken} className="w-full">
           Authenticate CLI
         </Button>
       </CardFooter>

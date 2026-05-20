@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useAuth } from "@clerk/nextjs";
+import { useAuth } from "@/lib/use-auth";
 import { client } from "@/client/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";

@@ -1,7 +1,7 @@
 import { client } from "@/client/client";
 import { contract } from "@/client/contract";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { useAuth } from "@clerk/nextjs";
+import { useAuth } from "@/lib/use-auth";
 import { ClientInferResponseBody } from "@ts-rest/core";
 import { startCase } from "lodash";
 import { Info, Blocks, ChevronRight } from "lucide-react";

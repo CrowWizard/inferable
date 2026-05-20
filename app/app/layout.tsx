@@ -3,7 +3,7 @@
 import { PostHogUser } from "@/components/posthog-user";
 import { RollbarUser } from "@/components/rollbar-user";
 import { cn } from "@/lib/utils";
-import { ClerkProvider } from "@clerk/nextjs";
+
 import { Provider as RollbarProvider } from "@rollbar/react";
 import dynamic from "next/dynamic";
 import { Inter as FontSans } from "next/font/google";
@@ -53,12 +53,7 @@ export default function RootLayout({
       };
 
   return (
-    <ClerkProvider
-      allowedRedirectOrigins={[
-        process.env.NEXT_PUBLIC_CLERK_ALLOWED_REDIRECT_ORIGIN ?? "",
-      ]}
-    >
-      <RollbarProvider config={rollbarConfig}>
+    <RollbarProvider config={rollbarConfig}>
         <html lang="en">
           <body
             className={cn(
@@ -91,6 +86,5 @@ export default function RootLayout({
         <RollbarUser />
         <PostHogUser />
       </RollbarProvider>
-    </ClerkProvider>
   );
 }

@@ -66,7 +66,7 @@ import {
   validTypes,
 } from "@l1m/core";
 import { buildModel } from "../models";
-import Anthropic from "@anthropic-ai/sdk";
+import OpenAI from "openai";
 import { sendSlackNotification } from "../integrations/slack";
 
 import { sendEmail } from "../email";
@@ -1576,28 +1576,27 @@ export const router = initServer().router(contract, {
 
     if (!providerModel || !providerKey || !providerUrl) {
       const model = buildModel({
-        identifier: "claude-3-5-sonnet",
+        identifier: "deepseek-v4-flash",
         trackingOptions: {
           clusterId: clusterId,
         },
       });
 
       provider = async (params, prompt, previousAttempts) => {
-        const messages: Anthropic.MessageParam[] = [];
+        const messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = [];
 
         const { type, input } = params;
 
         if (type && type.startsWith("image/")) {
+          // OpenAI vision format
           messages.push({
             role: "user",
             content: [
               { type: "text", text: `${instructions} ${prompt}` },
               {
-                type: "image",
-                source: {
-                  type: "base64",
-                  media_type: type as any,
-                  data: input,
+                type: "image_url",
+                image_url: {
+                  url: `data:${type};base64,${input}`,
                 },
               },
             ],
@@ -1626,10 +1625,11 @@ export const router = initServer().router(contract, {
           messages,
         });
 
-        if (result.raw.content[0]?.type === "text") {
-          return result.raw.content[0].text;
+        const content = result.raw.choices[0]?.message?.content;
+        if (typeof content === "string") {
+          return content;
         } else {
-          throw new Error("Anthropic API returned invalid response");
+          throw new Error("LLM API returned invalid response");
         }
       };
     } else {

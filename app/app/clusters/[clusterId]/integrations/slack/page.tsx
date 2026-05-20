@@ -3,7 +3,7 @@
 import { client } from "@/client/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { useAuth } from "@clerk/nextjs";
+import { useAuth } from "@/lib/use-auth";
 import { useCallback, useEffect, useState } from "react";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";

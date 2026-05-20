@@ -1,9 +1,10 @@
-import { authMiddleware } from "@clerk/nextjs";
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 
-export default authMiddleware({
-  ignoredRoutes: ["/api/health"],
-  apiRoutes: ["/api/(.*)"],
-});
+// Clerk middleware removed — all routes are public in self-hosted mode.
+export function middleware(request: NextRequest) {
+  return NextResponse.next();
+}
 
 export const config = {
   matcher: ["/((?!_next).*)", "/", "/api/:path*"],

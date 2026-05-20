@@ -192,7 +192,7 @@ const startTime = Date.now();
     });
 
   try {
-    await app.listen({ port: 4000, host: "0.0.0.0" });
+    await app.listen({ port: 7000, host: "0.0.0.0" });
   } catch (err) {
     logger.error("Failed to start server", { error: err });
     process.exit(1);
@@ -200,7 +200,7 @@ const startTime = Date.now();
 
   logger.info("Server started", {
     pid: process.pid,
-    port: 4000,
+    port: 7000,
     latency: Date.now() - startTime,
   });
 })().catch(err => {

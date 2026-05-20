@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useAuth } from "@clerk/nextjs";
+import { useAuth } from "@/lib/use-auth";
 import { Button } from "./ui/button";
 import { Cpu } from "lucide-react";
 import { cn, createErrorToast } from "@/lib/utils";

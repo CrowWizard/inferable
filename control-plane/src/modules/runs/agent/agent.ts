@@ -70,7 +70,7 @@ export const createRunGraph = async ({
             })
           : // Otherwise, use the real model
             buildModel({
-              identifier: "claude-3-5-sonnet",
+              identifier: "deepseek-v4-flash",
               purpose: "agent_loop.reasoning",
               trackingOptions: {
                 clusterId: state.run.clusterId,

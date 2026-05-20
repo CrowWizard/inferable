@@ -2,7 +2,7 @@
 
 import { client } from "@/client/client";
 import { contract } from "@/client/contract";
-import { useAuth } from "@clerk/nextjs";
+import { useAuth } from "@/lib/use-auth";
 import {
   ExternalLink,
   Network,

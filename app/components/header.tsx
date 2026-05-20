@@ -1,20 +1,5 @@
-import { OrganizationSwitcher, UserButton } from "@clerk/nextjs";
 import Image from "next/image";
 import logo from "./logo.png";
-
-// Common appearance settings for Clerk components
-const clerkAppearance = {
-  variables: {
-    colorText: "black",
-    fontSize: "14px",
-  },
-  elements: {
-    rootBox: "flex items-center",
-    userButtonBox: "flex items-center",
-    organizationSwitcherTrigger:
-      "flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors duration-200",
-  },
-};
 
 export function Header() {
   return (
@@ -32,21 +17,8 @@ export function Header() {
           </div>
         </a>
       </div>
-      <div className="flex items-center gap-6">
-        <UserButton
-          appearance={clerkAppearance}
-          afterSignOutUrl="/"
-          signInUrl="/sign-in"
-          showName
-        />
-        <div className="h-6 w-[1px] bg-gray-200" />
-        <OrganizationSwitcher
-          hidePersonal={true}
-          appearance={clerkAppearance}
-          afterCreateOrganizationUrl="/"
-          afterLeaveOrganizationUrl="/"
-          afterSelectOrganizationUrl="/switch-org"
-        />
+      <div className="flex items-center gap-4 pr-4">
+        <span className="text-sm text-gray-500">Dev User</span>
       </div>
     </header>
   );

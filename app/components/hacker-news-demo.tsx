@@ -10,7 +10,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { createErrorToast } from "@/lib/utils";
-import { useAuth, useUser } from "@clerk/nextjs";
+import { useAuth, useUser } from "@/lib/use-auth";
 import { format } from "date-fns";
 import { useState } from "react";
 import toast from "react-hot-toast";
@@ -87,7 +87,7 @@ export function HackerNewsDemo({ clusterId }: { clusterId: string }) {
         window.location.hostname === "127.0.0.1");
 
     const localhostEnvVar = isLocalhost
-      ? "export INFERABLE_API_ENDPOINT=http://localhost:4000\n"
+      ? "export INFERABLE_API_ENDPOINT=http://localhost:7000\n"
       : "";
 
     return `# Clone the starter repository

@@ -3,7 +3,7 @@
 import { client } from "@/client/client";
 import { Button, ButtonProps } from "@/components/ui/button";
 import { createErrorToast } from "@/lib/utils";
-import { useAuth } from "@clerk/nextjs";
+import { useAuth } from "@/lib/use-auth";
 import { PlusIcon } from "lucide-react";
 import { toast } from "react-hot-toast";
 import { useRouter } from "next/navigation";

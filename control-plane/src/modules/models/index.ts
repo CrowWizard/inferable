@@ -1,7 +1,6 @@
 import AsyncRetry from "async-retry";
 import { JsonSchema7Type } from "zod-to-json-schema";
-import Anthropic from "@anthropic-ai/sdk";
-import { ToolUseBlock } from "@anthropic-ai/sdk/resources";
+import OpenAI from "openai";
 import {
   ChatIdentifiers,
   CONTEXT_WINDOW,
@@ -15,19 +14,18 @@ import { isRetryableError } from "../../utilities/errors";
 import { logger } from "../observability/logger";
 import * as events from "../observability/events";
 import { addAttributes } from "../observability/tracer";
-import AnthropicBedrock from "@anthropic-ai/bedrock-sdk";
 import { rateLimiter } from "../../utilities/rate-limiter";
 import { trackCustomerTelemetry } from "../customer-telemetry/track";
 
 type CallInput = {
   system?: string | undefined;
-  messages: Anthropic.MessageParam[];
-  tools?: Anthropic.Tool[];
+  messages: OpenAI.Chat.Completions.ChatCompletionMessageParam[];
+  tools?: OpenAI.Chat.Completions.ChatCompletionTool[];
   maxTokens?: number;
 };
 
 type CallOutput = {
-  raw: Anthropic.Message;
+  raw: OpenAI.Chat.Completions.ChatCompletion;
 };
 
 type StructuredCallInput = CallInput & {
@@ -93,7 +91,20 @@ export const buildModel = ({
         throw new Error("Could not get model routing");
       }
 
-      return await routing.buildClient().embedQuery(input);
+      const client = routing.buildClient();
+      const modelId = routing.modelId;
+
+      const response = await client.embeddings.create({
+        model: modelId,
+        input: input,
+      });
+
+      const embedding = response.data[0]?.embedding;
+      if (!embedding) {
+        throw new Error("Embedding API returned no data");
+      }
+
+      return embedding;
     },
     call: async (options: CallInput) => {
       if (!isChatIdentifier(identifier)) {
@@ -101,7 +112,7 @@ export const buildModel = ({
       }
       const response = await AsyncRetry(
         async (bail, attempt) => {
-          let model: Anthropic | AnthropicBedrock = new Anthropic({
+          let client: OpenAI = new OpenAI({
             apiKey: provider?.key,
             baseURL: provider?.url,
           });
@@ -113,11 +124,11 @@ export const buildModel = ({
           });
 
           if (!provider) {
-            model = demoRouting?.buildClient();
+            client = demoRouting?.buildClient();
             modelId = demoRouting?.modelId;
           }
 
-          if (!model || !modelId) {
+          if (!client || !modelId) {
             bail(new Error("Could not get model routing"));
             return;
           }
@@ -146,19 +157,30 @@ export const buildModel = ({
             }
           }
 
-          const tools = options.tools ?? [];
+          const tools: OpenAI.Chat.Completions.ChatCompletionTool[] =
+            options.tools ?? [];
+
+          // Build OpenAI messages from system + messages
+          const openaiMessages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] =
+            [];
+
+          if (options.system) {
+            openaiMessages.push({
+              role: "system",
+              content: options.system,
+            });
+          }
+
+          openaiMessages.push(...options.messages);
 
           try {
             const startedAt = Date.now();
-            const response = await model.messages.create({
+            const response = await client.chat.completions.create({
               model: modelId,
               temperature,
-              stream: false,
               max_tokens: options.maxTokens ?? 2048,
-              system: options.system,
-              messages: options.messages,
-              // This is enforced above
-              tools: tools as Anthropic.Tool[],
+              messages: openaiMessages,
+              tools: tools.length > 0 ? tools : undefined,
             });
 
             // eslint-disable-next-line @typescript-eslint/no-floating-promises
@@ -168,11 +190,11 @@ export const buildModel = ({
               modelId,
               systemPrompt: options.system,
               tools,
-              inputTokens: response.usage.input_tokens,
-              outputTokens: response.usage.output_tokens,
+              inputTokens: response.usage?.prompt_tokens,
+              outputTokens: response.usage?.completion_tokens,
               temperature,
               input: options.messages,
-              output: response.content,
+              output: response.choices,
               startedAt,
               completedAt: Date.now(),
             });
@@ -207,7 +229,7 @@ export const buildModel = ({
 
       const response = await AsyncRetry(
         async (bail, attempt) => {
-          let model: Anthropic | AnthropicBedrock = new Anthropic({
+          let client: OpenAI = new OpenAI({
             apiKey: provider?.key,
             baseURL: provider?.url,
           });
@@ -219,36 +241,50 @@ export const buildModel = ({
           });
 
           if (!provider) {
-            model = demoRouting?.buildClient();
+            client = demoRouting?.buildClient();
             modelId = demoRouting?.modelId;
           }
 
-          if (!model || !modelId) {
+          if (!client || !modelId) {
             bail(new Error("Could not get model routing"));
             return;
           }
 
-          const tools = options.tools ?? [];
+          const tools: OpenAI.Chat.Completions.ChatCompletionTool[] =
+            options.tools ?? [];
+
+          // Build OpenAI messages from system + messages
+          const openaiMessages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] =
+            [];
+
+          if (options.system) {
+            openaiMessages.push({
+              role: "system",
+              content: options.system,
+            });
+          }
+
+          openaiMessages.push(...options.messages);
 
           try {
             const startedAt = Date.now();
-            const response = await model.messages.create({
+            const response = await client.chat.completions.create({
               model: modelId,
               temperature,
-              stream: false,
               max_tokens: options.maxTokens ?? 2048,
-              system: options.system,
-              messages: options.messages,
+              messages: openaiMessages,
               tool_choice: {
-                type: "tool",
-                name: "extract",
+                type: "function",
+                function: { name: "extract" },
               },
               tools: [
-                // This is enforced above
-                ...(tools as Anthropic.Tool[]),
+                ...tools,
                 {
-                  input_schema: options.schema as Anthropic.Tool.InputSchema,
-                  name: "extract",
+                  type: "function",
+                  function: {
+                    name: "extract",
+                    parameters: options.schema as Record<string, unknown>,
+                  },
                 },
               ],
             });
@@ -257,11 +293,11 @@ export const buildModel = ({
             trackModelUsage({
               ...trackingOptions,
               modelId,
-              inputTokens: response.usage.input_tokens,
-              outputTokens: response.usage.output_tokens,
+              inputTokens: response.usage?.prompt_tokens,
+              outputTokens: response.usage?.completion_tokens,
               temperature,
               input: options.messages,
-              output: response.content,
+              output: response.choices,
               startedAt,
               completedAt: Date.now(),
               purpose,
@@ -325,20 +361,33 @@ const handleErrror = async ({
 const parseStructuredResponse = ({
   response,
 }: {
-  response: Anthropic.Message;
+  response: OpenAI.Chat.Completions.ChatCompletion;
 }): Awaited<ReturnType<Model["structured"]>> => {
-  const toolCalls = response.content.filter(m => m.type === "tool_use");
+  const choice = response.choices[0];
+  const message = choice?.message;
 
-  const extractResult = toolCalls.find(
-    m => m.type === "tool_use" && m.name === "extract",
-  ) as ToolUseBlock;
-  if (!extractResult) {
-    throw new Error("Model did not return structured output");
+  if (!message?.tool_calls || message.tool_calls.length === 0) {
+    throw new Error("Model did not return structured output (no tool_calls)");
+  }
+
+  const extractCall = message.tool_calls.find(
+    call => call.function.name === "extract",
+  );
+
+  if (!extractCall) {
+    throw new Error("Model did not return structured output (no extract call)");
+  }
+
+  let structured: unknown;
+  try {
+    structured = JSON.parse(extractCall.function.arguments);
+  } catch {
+    throw new Error("Model returned invalid JSON in structured output");
   }
 
   return {
     raw: response,
-    structured: extractResult.input,
+    structured,
   };
 };
 
@@ -371,7 +420,7 @@ export const buildMockModel = ({
       );
 
       return {
-        raw: { content: [] } as unknown as Anthropic.Message,
+        raw: { choices: [] } as unknown as OpenAI.Chat.Completions.ChatCompletion,
         structured: data,
       };
     },
@@ -405,7 +454,7 @@ const trackModelUsage = async ({
   clusterId?: string;
   runId?: string;
   systemPrompt?: string;
-  tools?: Anthropic.Tool[];
+  tools?: OpenAI.Chat.Completions.ChatCompletionTool[];
 }) => {
   if (!clusterId) {
     logger.warn("No cluster id provided, usage tracking will be skipped", {

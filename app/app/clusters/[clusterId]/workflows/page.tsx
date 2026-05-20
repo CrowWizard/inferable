@@ -28,7 +28,7 @@ import {
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
 import { createErrorToast } from "@/lib/utils";
-import { useAuth, useUser } from "@clerk/nextjs";
+import { useAuth, useUser } from "@/lib/use-auth";
 import { ClientInferResponseBody } from "@ts-rest/core";
 import { formatDistance } from "date-fns";
 import Link from "next/link";

@@ -16,7 +16,7 @@ import {
   Zap,
 } from "lucide-react";
 import { client } from "@/client/client";
-import { useAuth } from "@clerk/nextjs";
+import { useAuth } from "@/lib/use-auth";
 import ErrorDisplay from "@/components/error-display";
 import { useRouter } from "next/navigation";
 import {

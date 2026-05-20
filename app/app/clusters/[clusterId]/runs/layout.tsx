@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { client } from "@/client/client";
 import { ClusterRunsLayout } from "@/components/cluster-runs-layout";
-import { useAuth } from "@clerk/nextjs";
+import { useAuth } from "@/lib/use-auth";
 import { usePathname } from "next/navigation";
 
 export default function Home({

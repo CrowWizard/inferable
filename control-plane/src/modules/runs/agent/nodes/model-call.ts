@@ -1,5 +1,5 @@
 import { ReleventToolLookup } from "../agent";
-import { toAnthropicMessage, toAnthropicMessages } from "../../messages";
+import { toOpenAIMessage, toOpenAIMessages } from "../../messages";
 import { logger } from "../../../observability/logger";
 import { RunGraphState, RunGraphStateMessage } from "../state";
 import { addAttributes, withSpan } from "../../../observability/tracer";
@@ -7,7 +7,6 @@ import { AgentError } from "../../../../utilities/errors";
 import { ulid } from "ulid";
 
 import { Model } from "../../../models";
-import { ToolUseBlock } from "@anthropic-ai/sdk/resources";
 
 import { Schema, Validator } from "jsonschema";
 import { buildModelSchema, ModelOutput } from "./model-output";
@@ -32,7 +31,7 @@ export const handleModelCall = (
 
 /**
  * Attempts to rescue a structured result that is a string by parsing it as JSON.
- * Sometimes the Claude gets confused and returns a stringified JSON object, which doesn't get parsed by the Anthropic SDK.
+ * Sometimes the model gets confused and returns a stringified JSON object.
  */
 function attemptRescueStringifiedStructuredResult(response: unknown) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -110,7 +109,7 @@ const _handleModelCall = async (
     messages: state.messages,
     systemPrompt: consolidatedSystemPrompt,
     modelContextWindow: model.contextWindow,
-    render: m => JSON.stringify(toAnthropicMessage(m)),
+    render: m => JSON.stringify(toOpenAIMessage(m)),
   });
 
   if (state.run.debug) {
@@ -126,7 +125,7 @@ const _handleModelCall = async (
   }
 
   const response = await model.structured({
-    messages: toAnthropicMessages(truncatedMessages),
+    messages: toOpenAIMessages(truncatedMessages),
     system: systemPrompt,
     schema,
   });
@@ -135,9 +134,15 @@ const _handleModelCall = async (
     throw new AgentError("Model call failed");
   }
 
-  const toolCalls = response.raw.content
-    .filter(m => m.type === "tool_use" && m.name !== "extract")
-    .map(m => m as ToolUseBlock);
+  // Extract tool calls from OpenAI response format
+  const rawMessage = response.raw.choices[0]?.message;
+  const toolCalls = (rawMessage?.tool_calls ?? [])
+    .filter(call => call.function.name !== "extract")
+    .map(call => ({
+      name: call.function.name,
+      input: JSON.parse(call.function.arguments),
+      id: call.id,
+    }));
 
   attemptRescueStringifiedStructuredResult(response);
 

@@ -6,7 +6,7 @@ services:
       - postgres
       - redis
     ports:
-      - "4000:4000"
+      - "7000:7000"
     environment:
       DATABASE_URL: "postgresql://inferable:inferable@postgres:5432/inferable"
       DATABASE_SSL_DISABLED: "true"

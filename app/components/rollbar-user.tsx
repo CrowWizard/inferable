@@ -1,6 +1,6 @@
 "use client";
 
-import { useAuth, useUser } from "@clerk/nextjs";
+import { useAuth, useUser } from "@/lib/use-auth";
 import { useRollbarPerson } from "@rollbar/react";
 
 export function RollbarUser() {

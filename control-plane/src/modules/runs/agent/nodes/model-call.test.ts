@@ -42,7 +42,7 @@ describe("handleModelCall", () => {
   const mockWithRawOutput = jest.fn();
 
   const model: Model = {
-    identifier: "claude-3-5-sonnet",
+    identifier: "deepseek-v4-flash",
     call: mockWithRawOutput,
     structured: mockWithStructuredOutput,
     embedQuery: jest.fn(),

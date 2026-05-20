@@ -1,4 +1,4 @@
-import { RateLimitError, InternalServerError } from "@anthropic-ai/sdk";
+import { RateLimitError, InternalServerError } from "openai";
 
 export class RetryableError extends Error {
   constructor(message: string) {
@@ -16,10 +16,11 @@ const retryableErrorMessages = [
   // DB Connection Pool Exhaustion
   "remaining connection slots are reserved for roles with the SUPERUSER attribute",
   "too many clients already",
-  // Bedrock Errors
-  "503 bedrock is unable to process your request",
+  // LLM Provider Errors
   "429 too many requests",
-  "403 You don't have access to the model with the specified model ID",
+  "503 service unavailable",
+  "rate_limit_exceeded",
+  "server_error",
 ];
 
 export const isRetryableError = (error: unknown) => {

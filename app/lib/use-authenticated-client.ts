@@ -1,5 +1,5 @@
 import { contract } from "@/client/contract";
-import { useAuth } from "@clerk/nextjs";
+import { useAuth } from "@/lib/use-auth";
 import { initClient } from "@ts-rest/core";
 import { useMemo } from "react";
 

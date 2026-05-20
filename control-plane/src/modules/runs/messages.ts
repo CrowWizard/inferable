@@ -1,4 +1,4 @@
-import Anthropic from "@anthropic-ai/sdk";
+import OpenAI from "openai";
 import { and, desc, eq, gt, InferSelectModel, ne, sql } from "drizzle-orm";
 import { ulid } from "ulid";
 import { z } from "zod";
@@ -292,54 +292,32 @@ export const getRunMessages = async ({
     });
 };
 
-export const toAnthropicMessages = (messages: TypedMessage[]): Anthropic.MessageParam[] => {
-  return (
-    messages
-      .map(toAnthropicMessage)
-      // Merge consecutive messages of the same role
-      .reduce((acc, msg) => {
-        const currentRole = msg.role;
-        const previousMsg = acc[acc.length - 1];
-
-        if (previousMsg?.role === currentRole) {
-          if (Array.isArray(previousMsg.content) && Array.isArray(msg.content)) {
-            previousMsg.content.push(...msg.content);
-            return acc;
-          }
-        }
-
-        acc.push(msg);
-        return acc;
-      }, [] as Anthropic.MessageParam[])
-  );
+export const toOpenAIMessages = (messages: TypedMessage[]): OpenAI.Chat.Completions.ChatCompletionMessageParam[] => {
+  return messages.map(toOpenAIMessage);
 };
 
-export const toAnthropicMessage = (message: TypedMessage): Anthropic.MessageParam => {
+export const toOpenAIMessage = (message: TypedMessage): OpenAI.Chat.Completions.ChatCompletionMessageParam => {
   switch (message.type) {
     case "agent": {
-      const toolUses =
-        message.data.invocations?.map(invocation => {
-          if (!invocation.id) throw new Error("Invocation is missing id");
-          return {
-            type: "tool_use" as const,
-            id: invocation.id,
-            input: invocation.input,
+      const toolCalls = message.data.invocations?.map(invocation => {
+        if (!invocation.id) throw new Error("Invocation is missing id");
+        return {
+          id: invocation.id,
+          type: "function" as const,
+          function: {
             name: invocation.toolName,
-          };
-        }) ?? [];
+            arguments: JSON.stringify(invocation.input),
+          },
+        };
+      }) ?? [];
 
       return {
         role: "assistant",
-        content: [
-          {
-            type: "text",
-            text: JSON.stringify({
-              ...message.data,
-              invocations: undefined,
-            }),
-          },
-          ...toolUses,
-        ],
+        content: JSON.stringify({
+          ...message.data,
+          invocations: undefined,
+        }),
+        tool_calls: toolCalls.length > 0 ? toolCalls : undefined,
       };
     }
     case "agent-invalid": {
@@ -350,19 +328,9 @@ export const toAnthropicMessage = (message: TypedMessage): Anthropic.MessagePara
     }
     case "invocation-result": {
       return {
-        role: "user",
-        content: [
-          {
-            type: "tool_result",
-            tool_use_id: message.data.id,
-            content: [
-              {
-                type: "text",
-                text: JSON.stringify(message.data.result),
-              },
-            ],
-          },
-        ],
+        role: "tool",
+        tool_call_id: message.data.id,
+        content: JSON.stringify(message.data.result),
       };
     }
     case "supervisor":

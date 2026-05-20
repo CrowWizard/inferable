@@ -10,7 +10,7 @@ import {
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { RunJob } from "@/lib/types";
 import { unpack } from "@/lib/utils";
-import { useAuth } from "@clerk/nextjs";
+import { useAuth } from "@/lib/use-auth";
 import { ClientInferResponseBody } from "@ts-rest/core";
 import { Code2, Terminal } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";

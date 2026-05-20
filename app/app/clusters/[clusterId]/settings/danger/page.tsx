@@ -22,7 +22,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { client } from "@/client/client";
 import { createErrorToast } from "@/lib/utils";
-import { useAuth } from "@clerk/nextjs";
+import { useAuth } from "@/lib/use-auth";
 import { useState, useCallback } from "react";
 import toast from "react-hot-toast";
 

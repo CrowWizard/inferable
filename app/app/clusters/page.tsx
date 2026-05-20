@@ -3,7 +3,7 @@ import { GlobalBreadcrumbs } from "@/components/breadcrumbs";
 import { ClustersTable } from "@/components/clusters-table";
 import { CreateClusterButton } from "@/components/create-cluster-button";
 import ErrorDisplay from "@/components/error-display";
-import { auth } from "@clerk/nextjs";
+import { auth } from "@/lib/auth-server";
 
 export const metadata = {
   title: "Clusters",

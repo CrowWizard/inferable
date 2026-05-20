@@ -39,7 +39,10 @@ const envSchema = z
     REDIS_URL: z.string().url(),
 
     ANTHROPIC_API_KEY: z.string().optional(),
-    COHERE_API_KEY: z.string().optional(),
+    OPENAI_API_KEY: z.string().optional(),
+    OPENAI_BASE_URL: z.string().url().optional(),
+    SILICONFLOW_API_KEY: z.string().optional(),
+    SILICONFLOW_BASE_URL: z.string().url().optional(),
 
     NANGO_SECRET_KEY: z.string().optional(),
     NANGO_SLACK_INTEGRATION_ID: z.string().default("slack"),
@@ -57,7 +60,9 @@ const envSchema = z
     JWT_IGNORE_EXPIRATION: truthy.default(false),
     CLERK_SECRET_KEY: z.string().optional(),
 
-    BEDROCK_AVAILABLE: truthy.default(false),
+    INFERABLE_AUTH_TOKEN: z.string().optional(),
+
+    BEDROCK_AVAILABLE: truthy.default(false), // kept for backward compat, no longer used for embeddings
 
     INFERABLE_EMAIL_DOMAIN: z.string().default("run.inferable.ai"),
 

@@ -212,6 +212,33 @@ export const extractAuthState = async (
   }
 
   if (!env.JWKS_URL) {
+    // Self-hosted mode: accept the dev token directly
+    if (token === (env.INFERABLE_AUTH_TOKEN || "dev-token")) {
+      return {
+        type: "clerk",
+        entityId: "clerk:dev-user",
+        organizationId: "dev-org",
+        organizationRole: "org:admin",
+        canAccess: async function (opts) {
+          return this;
+        },
+        canManage: async function (opts) {
+          return this;
+        },
+        canCreate: function (opts) {
+          return this;
+        },
+        isAdmin: function () {
+          return this;
+        },
+        isMachine: function () {
+          throw new AuthenticationError("Dev auth is not machine");
+        },
+        isClerk: function () {
+          return this;
+        },
+      } as ClerkAuth;
+    }
     throw new AuthenticationError("JWKS_URL is not set");
   }
 

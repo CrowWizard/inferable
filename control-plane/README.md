@@ -64,13 +64,13 @@ npm run migrate
 npm run dev
 ```
 
-The API will be available at `http://localhost:4000`.
+The API will be available at `http://localhost:7000`.
 
 4. Connect via the CLI (Optional):
 
 ```bash
 npm install -g @inferable/cli
-export INFERABLE_API_ENDPOINT=http://localhost:4000
+export INFERABLE_API_ENDPOINT=http://localhost:7000
 
 # If running in headless mode, you will be prompted for the management API secret
 inf auth login

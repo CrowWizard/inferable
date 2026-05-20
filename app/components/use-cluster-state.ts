@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { useAuth } from "@clerk/nextjs";
+import { useAuth } from "@/lib/use-auth";
 import { client } from "@/client/client";
 import type { contract } from "@/client/contract";
 import { ClientInferResponseBody } from "@ts-rest/core";

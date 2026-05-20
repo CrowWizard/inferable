@@ -832,20 +832,8 @@ export const definition = {
     headers: z.object({
       authorization: z.string(),
       "x-provider-key": z.string().optional(),
-      "x-provider-model": z
-        .enum([
-          "claude-3-7-sonnet-20250219",
-          "claude-3-7-sonnet-latest",
-          "claude-3-5-sonnet-20241022",
-          "claude-3-5-sonnet-latest",
-          "claude-3-5-sonnet-20240620",
-          "claude-3-5-haiku-20241022",
-          "claude-3-5-haiku-latest",
-        ])
-        .optional(),
-      "x-provider-url": z
-        .literal("https://api.anthropic.com")
-        .default("https://api.anthropic.com"),
+      "x-provider-model": z.string().optional(),
+      "x-provider-url": z.string().optional(),
     }),
     body: RunSchema,
     responses: {

@@ -12,7 +12,7 @@
     "migrate": "tsx -r dotenv/config src/utilities/run-migrate.ts",
     "studio": "npx drizzle-kit studio",
     "build": "tsc",
-    "start": "node dist/index.js",
+    "start": "node -r dotenv/config dist/index.js",
     "lint": "eslint src --ext .ts,.tsx,.js,.json --fix",
     "format": "prettier --write \"src/**/*.{ts,tsx}\"",
     "format:check": "prettier --check $(git diff --diff-filter=d --name-only origin/main HEAD | grep -E \"\\.(ts|tsx)$\" || echo \".\") || exit 0"
@@ -20,8 +20,7 @@
   "author": "Inferable, Inc.",
   "license": "MIT",
   "dependencies": {
-    "@anthropic-ai/bedrock-sdk": "^0.10.0",
-    "@anthropic-ai/sdk": "^0.36.3",
+    "openai": "^4.91.0",
     "@aws-sdk/client-s3": "^3.685.0",
     "@aws-sdk/client-ses": "^3.758.0",
     "@clerk/backend": "^1.21.4",
@@ -29,7 +28,6 @@
     "@fastify/cors": "^8.5.0",
     "@hyperdx/node-opentelemetry": "^0.8.1",
     "@l1m/core": "^0.1.5",
-    "@langchain/cohere": "^0.3.1",
     "@langchain/langgraph": "^0.1.9",
     "@nangohq/node": "^0.48.1",
     "@opentelemetry/instrumentation-redis": "^0.46.1",

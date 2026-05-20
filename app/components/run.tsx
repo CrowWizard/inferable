@@ -13,7 +13,7 @@ import { ulid } from "ulid";
 import { Textarea } from "./ui/textarea";
 
 import { createErrorToast } from "@/lib/utils";
-import { useAuth, useOrganization, useUser } from "@clerk/nextjs";
+import { useAuth, useOrganization, useUser } from "@/lib/use-auth";
 import { useQueue } from "@uidotdev/usehooks";
 import { MessageCircleWarning } from "lucide-react";
 import { DebugEvent } from "./debug-event";

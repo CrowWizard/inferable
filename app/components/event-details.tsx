@@ -9,7 +9,7 @@ import {
 import { ReadOnlyJSON } from "@/components/read-only-json";
 import { Button } from "@/components/ui/button";
 import { cn, createErrorToast } from "@/lib/utils";
-import { useAuth } from "@clerk/nextjs";
+import { useAuth } from "@/lib/use-auth";
 import { ClientInferResponseBody } from "@ts-rest/core";
 import { formatRelative } from "date-fns";
 import { startCase } from "lodash";

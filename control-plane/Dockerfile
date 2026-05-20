@@ -36,5 +36,5 @@ COPY --from=build /build/ /app
 ENV NODE_ENV=production
 ENV ENVIRONMENT=prod
 
-EXPOSE 4000
+EXPOSE 7000
 CMD [ "npm", "run", "start" ]

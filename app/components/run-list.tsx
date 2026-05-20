@@ -5,7 +5,7 @@ import { contract } from "@/client/contract";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { createErrorToast } from "@/lib/utils";
-import { useAuth, useUser } from "@clerk/nextjs";
+import { useAuth, useUser } from "@/lib/use-auth";
 import { ClientInferResponseBody } from "@ts-rest/core";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";

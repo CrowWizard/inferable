@@ -113,6 +113,15 @@ And more stuff...
 | Node.js / TypeScript | [Quick start](./sdk-node/README.md) | [NPM](https://www.npmjs.com/package/inferable)                   |
 | Go                   | [Quick start](./sdk-go/README.md)   | [Go](https://pkg.go.dev/github.com/inferablehq/inferable/sdk-go) |
 
+## 📐 Architecture
+
+In-depth project documentation lives in [`docs/`](./docs/README.md):
+
+- [docs/architecture.md](./docs/architecture.md) — System architecture, end-to-end data flow, versioning model, and Human-in-the-Loop state machine (with Mermaid diagrams).
+- [docs/internals.md](./docs/internals.md) — Deep-dive into the control-plane internals: `runs`, `jobs`, and `queues` modules, task scheduling, self-heal mechanism, and approval flow.
+
+See [docs/README.md](./docs/README.md) for an index with reading guides and audience descriptions for each document.
+
 ## 🚀 Open Source
 
 This repository contains the Inferable control-plane, as well as SDKs for various languages.

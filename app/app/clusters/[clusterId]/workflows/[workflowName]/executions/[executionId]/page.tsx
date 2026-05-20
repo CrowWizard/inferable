@@ -17,7 +17,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { cn, createErrorToast } from "@/lib/utils";
-import { useAuth, useUser } from "@clerk/nextjs";
+import { useAuth, useUser } from "@/lib/use-auth";
 import { ClientInferResponseBody } from "@ts-rest/core";
 import { formatDistance, formatRelative } from "date-fns";
 import {

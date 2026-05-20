@@ -9,7 +9,7 @@ import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { isFeatureEnabled } from "@/lib/features";
 import { cn, createErrorToast } from "@/lib/utils";
-import { useAuth } from "@clerk/nextjs";
+import { useAuth } from "@/lib/use-auth";
 import { ClientInferRequest } from "@ts-rest/core";
 import {
   Blocks,

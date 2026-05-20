@@ -1,11 +1,11 @@
 import { isRetryableError, RetryableError } from "./errors";
-import { RateLimitError } from "@anthropic-ai/sdk";
+import { RateLimitError } from "openai";
 
 describe("isRetryableError", () => {
   it("should return true for retryable errors", async () => {
     expect(isRetryableError(new Error())).toBe(false);
 
-    expect(isRetryableError(new RateLimitError(429, new Error(), "", {}))).toBe(true);
+    expect(isRetryableError(new RateLimitError(429, "rate_limit", "Rate limit exceeded",  {}))).toBe(true);
     expect(isRetryableError(new RetryableError(""))).toBe(true);
 
 

@@ -1,90 +1,128 @@
 import { env } from "../../utilities/env";
-import { AnthropicBedrock } from "@anthropic-ai/bedrock-sdk";
-import { Anthropic } from "@anthropic-ai/sdk";
+import OpenAI from "openai";
 import { logger } from "../observability/logger";
 import { BedrockCohereEmbeddings } from "../embeddings/bedrock-cohere-embeddings";
 import { CohereEmbeddings } from "@langchain/cohere";
 
 export const CONTEXT_WINDOW: Record<string, number> = {
-  "claude-3-5-sonnet": 200_000,
-  "claude-3-haiku": 200_000,
+  "deepseek-v4-flash": 128_000,
+  "dedeepseek-v4-pro": 128_000,
+  "qwen-plus": 131_072,
+  "qwen-turbo": 1_000_000,
+  "qwen-max": 32_768,
+  "gpt-4o": 128_000,
+  "gpt-4o-mini": 128_000,
+  "gpt-4.1": 1_047_576,
+  "gpt-4.1-mini": 1_047_576,
+  "gpt-4.1-nano": 1_047_576,
 };
 
 const routingOptions = {
-  "claude-3-5-sonnet": [
-    ...(env.BEDROCK_AVAILABLE
+  "deepseek-v4-flash": [
+    ...(env.OPENAI_API_KEY
       ? [
           {
-            buildClient: () => buildBedrockAnthropicClient("us-west-2"),
-            modelId: "us.anthropic.claude-3-5-sonnet-20241022-v2:0",
-            beta: false,
-          },
-          {
-            buildClient: () => buildBedrockAnthropicClient("us-east-1"),
-            modelId: "us.anthropic.claude-3-5-sonnet-20241022-v2:0",
-            beta: false,
-          },
-          {
-            buildClient: () => buildBedrockAnthropicClient("eu-central-1"),
-            // 20240620 not yet available
-            modelId: "eu.anthropic.claude-3-5-sonnet-20240620-v1:0",
-            beta: false,
-          },
-          {
-            buildClient: () => buildBedrockAnthropicClient("ap-northeast-1"),
-            // 20240620 not yet available
-            modelId: "anthropic.claude-3-5-sonnet-20240620-v1:0",
-            beta: false,
-          },
-          {
-            buildClient: () => buildBedrockAnthropicClient("ap-northeast-2"),
-            // 20240620 not yet available
-            modelId: "anthropic.claude-3-5-sonnet-20240620-v1:0",
-            beta: false,
-          },
-        ]
-      : []),
-
-    ...(env.ANTHROPIC_API_KEY
-      ? [
-          {
-            buildClient: () => buildAnthropicClient(),
-            modelId: "claude-3-5-sonnet-20241022",
+            buildClient: () => buildOpenAIClient(),
+            modelId: "deepseek-v4-flash",
             beta: false,
           },
         ]
       : []),
   ],
-  "claude-3-haiku": [
-    ...(env.BEDROCK_AVAILABLE
+  "deepseek-v4-pro": [
+    ...(env.OPENAI_API_KEY
       ? [
           {
-            buildClient: () => buildBedrockAnthropicClient("us-east-1"),
-            modelId: "us.anthropic.claude-3-haiku-20240307-v1:0",
-            beta: false,
-          },
-          {
-            buildClient: () => buildBedrockAnthropicClient("eu-central-1"),
-            modelId: "eu.anthropic.claude-3-haiku-20240307-v1:0",
-            beta: false,
-          },
-          {
-            buildClient: () => buildBedrockAnthropicClient("ap-northeast-1"),
-            modelId: "anthropic.claude-3-haiku-20240307-v1:0",
-            beta: false,
-          },
-          {
-            buildClient: () => buildBedrockAnthropicClient("ap-northeast-2"),
-            modelId: "anthropic.claude-3-haiku-20240307-v1:0",
+            buildClient: () => buildOpenAIClient(),
+            modelId: "deepseek-v4-pro",
             beta: false,
           },
         ]
       : []),
-    ...(env.ANTHROPIC_API_KEY
+  ],
+  "qwen-plus": [
+    ...(env.OPENAI_API_KEY
       ? [
           {
-            buildClient: () => buildAnthropicClient(),
-            modelId: "claude-3-haiku-20240307",
+            buildClient: () => buildOpenAIClient(),
+            modelId: "qwen-plus",
+            beta: false,
+          },
+        ]
+      : []),
+  ],
+  "qwen-turbo": [
+    ...(env.OPENAI_API_KEY
+      ? [
+          {
+            buildClient: () => buildOpenAIClient(),
+            modelId: "qwen-turbo",
+            beta: false,
+          },
+        ]
+      : []),
+  ],
+  "qwen-max": [
+    ...(env.OPENAI_API_KEY
+      ? [
+          {
+            buildClient: () => buildOpenAIClient(),
+            modelId: "qwen-max",
+            beta: false,
+          },
+        ]
+      : []),
+  ],
+  "gpt-4o": [
+    ...(env.OPENAI_API_KEY
+      ? [
+          {
+            buildClient: () => buildOpenAIClient(),
+            modelId: "gpt-4o",
+            beta: false,
+          },
+        ]
+      : []),
+  ],
+  "gpt-4o-mini": [
+    ...(env.OPENAI_API_KEY
+      ? [
+          {
+            buildClient: () => buildOpenAIClient(),
+            modelId: "gpt-4o-mini",
+            beta: false,
+          },
+        ]
+      : []),
+  ],
+  "gpt-4.1": [
+    ...(env.OPENAI_API_KEY
+      ? [
+          {
+            buildClient: () => buildOpenAIClient(),
+            modelId: "gpt-4.1",
+            beta: false,
+          },
+        ]
+      : []),
+  ],
+  "gpt-4.1-mini": [
+    ...(env.OPENAI_API_KEY
+      ? [
+          {
+            buildClient: () => buildOpenAIClient(),
+            modelId: "gpt-4.1-mini",
+            beta: false,
+          },
+        ]
+      : []),
+  ],
+  "gpt-4.1-nano": [
+    ...(env.OPENAI_API_KEY
+      ? [
+          {
+            buildClient: () => buildOpenAIClient(),
+            modelId: "gpt-4.1-nano",
             beta: false,
           },
         ]
@@ -92,22 +130,15 @@ const routingOptions = {
   ],
 };
 
+
+
 const embeddingOptions = {
-  "embed-english-v3": [
-    ...(env.BEDROCK_AVAILABLE
+  "BAAI/bge-m3": [
+    ...(env.SILICONFLOW_API_KEY
       ? [
           {
-            buildClient: () => buildBedrockCohereClient("us-west-2"),
-            modelId: "cohere.embed-english-v3",
-            beta: false,
-          },
-        ]
-      : []),
-    ...(env.COHERE_API_KEY
-      ? [
-          {
-            buildClient: () => buildCohereClient(),
-            modelId: "embed-english-v3.0",
+            buildClient: () => buildSiliconFlowClient(),
+            modelId: "BAAI/bge-m3",
             beta: false,
           },
         ]
@@ -164,40 +195,25 @@ export const getEmbeddingRouting = ({
   return routing;
 };
 
-const buildBedrockAnthropicClient = (region: string) => {
-  if (!env.BEDROCK_AVAILABLE) {
-    throw new Error("BEDROCK_AVAILABLE not set");
+const buildOpenAIClient = () => {
+  if (!env.OPENAI_API_KEY) {
+    throw new Error("Missing OPENAI_API_KEY");
   }
 
-  return new AnthropicBedrock({
-    awsRegion: region,
+  return new OpenAI({
+    apiKey: env.OPENAI_API_KEY,
+    baseURL: env.OPENAI_BASE_URL || "https://api.openai.com/v1",
   });
 };
 
-const buildAnthropicClient = () => {
-  if (!env.ANTHROPIC_API_KEY) {
-    throw new Error("Missing ANTHROPIC_API_KEY");
+const buildSiliconFlowClient = () => {
+  if (!env.SILICONFLOW_API_KEY) {
+    throw new Error("Missing SILICONFLOW_API_KEY");
   }
 
-  return new Anthropic({
-    apiKey: env.ANTHROPIC_API_KEY,
-  });
-};
-
-const buildBedrockCohereClient = (region: string) => {
-  return new BedrockCohereEmbeddings({
-    model: "cohere.embed-english-v3",
-    region: region,
-  });
-};
-
-const buildCohereClient = () => {
-  if (!env.COHERE_API_KEY) {
-    throw new Error("Missing COHERE_API_KEY");
-  }
-
-  return new CohereEmbeddings({
-    model: "embed-english-v3.0",
+  return new OpenAI({
+    apiKey: env.SILICONFLOW_API_KEY,
+    baseURL: env.SILICONFLOW_BASE_URL || "https://api.siliconflow.cn/v1",
   });
 };
 
@@ -212,7 +228,7 @@ export const start = () => {
 
   for (const [key, value] of Object.entries(embeddingOptions)) {
     if (value.length === 0) {
-      throw new Error(`No provider available for ${key}`);
+      logger.warn(`No provider available for ${key}. Set SILICONFLOW_API_KEY to enable embeddings.`);
     } else {
       logger.info(`Provider available for ${key}`, {
         value,

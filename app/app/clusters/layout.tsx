@@ -1,6 +1,6 @@
 import { Header } from "@/components/header";
 import { OrgList } from "@/components/org-list";
-import { auth } from "@clerk/nextjs";
+import { auth } from "@/lib/auth-server";
 
 export default async function Layout({ children }: Readonly<{ children: React.ReactNode }>) {
   const user = await auth();

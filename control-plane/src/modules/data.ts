@@ -182,10 +182,10 @@ export const tools = pgTable(
     should_expire: boolean("should_expire").notNull(),
     last_ping_at: timestamp("last_ping_at", { withTimezone: true }).notNull(),
     embedding_1024: vector("embedding_1024", {
-      dimensions: 1024, // for embed-english-v3
+      dimensions: 1024, // for BAAI/bge-m3
     }).notNull(),
     embedding_model: text("embedding_model", {
-      enum: ["embed-english-v3"],
+      enum: ["BAAI/bge-m3"],
     }).notNull(),
     created_at: timestamp("created_at", {
       withTimezone: true,
@@ -271,7 +271,7 @@ export const runs = pgTable(
     name: varchar("name", { length: 1024 }).default("").notNull(),
     system_prompt: text("system_prompt"),
     model_identifier: text("model_identifier", {
-      enum: ["claude-3-5-sonnet", "claude-3-haiku"],
+      enum: ["deepseek-v4-flash", "deepseek-v4-pro"],
     }),
     user_id: varchar("user_id", { length: 1024 }).notNull(),
     cluster_id: varchar("cluster_id")

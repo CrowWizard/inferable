@@ -26,7 +26,7 @@ export const generateTitle = async (
   });
 
   const model = buildModel({
-    identifier: "claude-3-haiku",
+    identifier: "deepseek-v4-flash",
     purpose: "agent_loop.generate_title",
     trackingOptions: {
       clusterId: run.clusterId,

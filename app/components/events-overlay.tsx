@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/chart";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { useAuth } from "@clerk/nextjs";
+import { useAuth } from "@/lib/use-auth";
 import type { ClientInferResponseBody } from "@ts-rest/core";
 import { format } from "date-fns";
 import { snakeCase, startCase } from "lodash";

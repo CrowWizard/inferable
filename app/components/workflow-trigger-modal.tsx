@@ -31,7 +31,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { client } from "@/client/client";
-import { useAuth } from "@clerk/nextjs";
+import { useAuth } from "@/lib/use-auth";
 import { createErrorToast } from "@/lib/utils";
 import toast from "react-hot-toast";
 import { ClientInferResponseBody } from "@ts-rest/core";

@@ -4,17 +4,36 @@ import { getRouting } from "./routing";
 
 const mockCreate = jest.fn(() => ({
   usage: {
-    input_tokens: 0,
-    output_tokens: 0,
+    prompt_tokens: 0,
+    completion_tokens: 0,
   },
+  choices: [
+    {
+      message: {
+        content: "test",
+        tool_calls: [
+          {
+            id: "call_1",
+            type: "function",
+            function: {
+              name: "extract",
+              arguments: "{}",
+            },
+          },
+        ],
+      },
+    },
+  ],
 }));
 
 jest.mock("./routing", () => ({
   ...jest.requireActual("./routing"),
   getRouting: jest.fn(() => ({
     buildClient: jest.fn(() => ({
-      messages: {
-        create: mockCreate,
+      chat: {
+        completions: {
+          create: mockCreate,
+        },
       },
     })),
     modelId: "modelId",
@@ -35,7 +54,7 @@ describe("buildModel", () => {
       });
 
       const model = buildModel({
-        identifier: "claude-3-haiku",
+        identifier: "deepseek-v4-flash",
       });
 
       await model.call({
@@ -46,12 +65,12 @@ describe("buildModel", () => {
 
       expect(getRouting).toHaveBeenCalledWith({
         index: 0,
-        identifier: "claude-3-haiku",
+        identifier: "deepseek-v4-flash",
       });
 
       expect(getRouting).toHaveBeenCalledWith({
         index: 1,
-        identifier: "claude-3-haiku",
+        identifier: "deepseek-v4-flash",
       });
     });
 
@@ -63,7 +82,7 @@ describe("buildModel", () => {
       });
 
       const model = buildModel({
-        identifier: "claude-3-haiku",
+        identifier: "deepseek-v4-flash",
       });
 
       await expect(
@@ -77,7 +96,7 @@ describe("buildModel", () => {
 
       expect(getRouting).toHaveBeenCalledWith({
         index: 0,
-        identifier: "claude-3-haiku",
+        identifier: "deepseek-v4-flash",
       });
     });
 
@@ -87,7 +106,7 @@ describe("buildModel", () => {
       });
 
       const model = buildModel({
-        identifier: "claude-3-haiku",
+        identifier: "deepseek-v4-flash",
       });
 
       await expect(
@@ -100,27 +119,27 @@ describe("buildModel", () => {
 
       expect(getRouting).toHaveBeenCalledWith({
         index: 0,
-        identifier: "claude-3-haiku",
+        identifier: "deepseek-v4-flash",
       });
 
       expect(getRouting).toHaveBeenCalledWith({
         index: 1,
-        identifier: "claude-3-haiku",
+        identifier: "deepseek-v4-flash",
       });
 
       expect(getRouting).toHaveBeenCalledWith({
         index: 2,
-        identifier: "claude-3-haiku",
+        identifier: "deepseek-v4-flash",
       });
 
       expect(getRouting).toHaveBeenCalledWith({
         index: 3,
-        identifier: "claude-3-haiku",
+        identifier: "deepseek-v4-flash",
       });
 
       expect(getRouting).toHaveBeenCalledWith({
         index: 4,
-        identifier: "claude-3-haiku",
+        identifier: "deepseek-v4-flash",
       });
     }, 60_000);
   });

@@ -22,7 +22,7 @@ export class BedrockCohereEmbeddings extends Embeddings {
   constructor(fields?: Record<string, any>) {
     super(fields ?? {});
 
-    this.model = fields?.model ?? "cohere.embed-english-v3";
+    this.model = fields?.model ?? "BAAI/bge-m3";
 
     this.client =
       fields?.client ??

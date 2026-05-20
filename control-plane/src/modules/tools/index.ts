@@ -311,7 +311,7 @@ export async function upsertToolDefinition({
   }
 
   const embedding = await buildModel({
-    identifier: "embed-english-v3",
+    identifier: "BAAI/bge-m3",
   }).embedQuery(
     JSON.stringify({
       name,
@@ -331,7 +331,7 @@ export async function upsertToolDefinition({
       last_ping_at: new Date(),
       should_expire: shouldExpire,
       embedding_1024: embedding,
-      embedding_model: "embed-english-v3",
+      embedding_model: "BAAI/bge-m3",
       hash,
     })
     .onConflictDoUpdate({
